@@ -1,0 +1,22 @@
+# TEST RUNNER IMAGE
+FROM node:14.19
+
+WORKDIR /usr/local/src/game-services
+
+# Setup yarn
+RUN yarn set version 3.2.0 &&\
+    yarn plugin import workspace-tools &&\
+    yarn config set nodeLinker node-modules
+COPY yarn.lock .
+COPY .yarn .
+
+# Add all tsconfig, package.json and install dependencies
+COPY ./*.json .
+COPY packages/scores/*.json packages/scores/
+COPY packages/shared/*.json packages/shared/
+RUN yarn install
+
+COPY packages/ packages/
+COPY test/ test/
+
+ENTRYPOINT ["yarn", "test"]

@@ -1,0 +1,15 @@
+{
+  "name": "scores",
+  "private": true,
+  "type": "module",
+  "packageManager": "yarn@3.2.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -r ./dist"
+  },
+  "dependencies": {
+    "shared": "workspace:^"
+  }
+}

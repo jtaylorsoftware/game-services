@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2017",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "baseUrl": "./src"
+  },
+  "include": ["./src/**/*", "index.ts"],
+  "references": [{ "path": "../shared" }]
+}
