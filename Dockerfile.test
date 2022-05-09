@@ -17,6 +17,6 @@ COPY packages/shared/*.json packages/shared/
 RUN yarn install
 
 COPY packages/ packages/
-COPY test/ test/
+RUN yarn build
 
 ENTRYPOINT ["yarn", "test"]

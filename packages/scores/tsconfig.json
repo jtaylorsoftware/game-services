@@ -4,9 +4,8 @@
     "target": "ES2017",
     "module": "ESNext",
     "moduleResolution": "node",
-    "outDir": "dist",
-    "baseUrl": "./src"
+    "outDir": "dist"
   },
-  "include": ["./src/**/*", "index.ts"],
+  "include": ["lib/**/*", "index.ts"],
   "references": [{ "path": "../shared" }]
 }

@@ -1,1 +1,2 @@
-export * from './src/addpunctuation.js'
+export * from './src/result.js'
+export * from './src/model.js'
