@@ -14,6 +14,7 @@ COPY .yarn .
 COPY ./*.json .
 COPY packages/scores/*.json packages/scores/
 COPY packages/shared/*.json packages/shared/
+COPY packages/games/*.json packages/games/
 RUN yarn install
 
 COPY packages/ packages/

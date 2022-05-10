@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2017",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "outDir": "dist"
+  },
+  "include": ["lib/**/*", "lambda/**/*", "index.ts"],
+  "references": [{ "path": "../shared" }]
+}
