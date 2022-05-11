@@ -67,7 +67,7 @@ describe('DynamoDbGameScoreDao', () => {
         PlayerId: 'id',
         PlayerUsername: 'username',
         Score: 500,
-        CreatedDateTime: new Date(),
+        CreatedDateTime: new Date().toISOString(),
       }
 
       sinon.stub(ddbDocClient, 'send').rejects('ERROR')
@@ -94,7 +94,7 @@ describe('DynamoDbGameScoreDao', () => {
       )
       assert.equal(
         ddbInput.IndexName,
-        GlobalIndices.GameTitleScore.IndexName,
+        GlobalIndices.GameTitleScoreIndex.IndexName,
         'should use the correct Index'
       )
       assert.include(

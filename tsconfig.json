@@ -19,6 +19,7 @@
   },
   "references": [
     { "path": "./packages/shared" },
-    { "path": "./packages/scores" }
+    { "path": "./packages/scores" },
+    { "path": "./packages/games" }
   ]
 }

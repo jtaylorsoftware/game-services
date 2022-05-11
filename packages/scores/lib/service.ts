@@ -1,15 +1,14 @@
-import { GameScoreDao } from './data/dao.js'
+import { ManagementClient } from 'auth0'
+import type { AxiosInstance } from 'axios'
+import axios from 'axios'
+import { Game, isSuccess, Result } from 'shared'
+import { GameScoreDao, DaoError } from './data/dao.js'
 import {
-  GameScoreSubmission,
-  GameScore,
   BasicUserData,
+  GameScore,
+  GameScoreSubmission,
   UserId,
 } from './model.js'
-import { Game, isSuccess, Result } from 'shared'
-import { ManagementClient } from 'auth0'
-import axios from 'axios'
-import type { AxiosInstance } from 'axios'
-import qs from 'qs'
 
 /**
  * Provides methods to get user data that is necessary to fulfill
@@ -116,7 +115,9 @@ export class GameQueryService {
    */
   async getGameByTitle(title: string): Promise<Result<Game>> {
     try {
-      const response = await this._axios.get(`?${qs.stringify({ title })}`)
+      console.log(`fetching ${this._axios.defaults.baseURL}/games`)
+      const response = await this._axios.get('/games', { params: { title } })
+      console.log('axios response:', response)
       return {
         status: 200,
         data: response.data,
@@ -148,11 +149,7 @@ export class GameScoreService {
     private dao: GameScoreDao,
     private users: UserQueryService,
     private games: GameQueryService
-  ) {
-    this.dao
-    this.users
-    this.games
-  }
+  ) {}
 
   /**
    * Saves a new score, assigning it a unique id and populating fields such as
@@ -210,12 +207,19 @@ export class GameScoreService {
         },
       }
     } catch (error) {
+      if (error instanceof DaoError) {
+        console.error('DDB error saving score:', error.wrapped)
+      }
       return {
         status: 500,
         message: 'Internal error',
       }
     }
   }
+}
+
+export class GameScoreQueryService {
+  constructor(private dao: GameScoreDao) {}
 
   /**
    *
@@ -232,11 +236,20 @@ export class GameScoreService {
     gameTitle: string,
     count: number
   ): Promise<Result<GameScore[]>> {
-    gameTitle
-    count
-    return {
-      status: 200,
-      data: [],
+    try {
+      const scores = await this.dao.getByGame(gameTitle, count)
+      return {
+        status: 200,
+        data: scores,
+      }
+    } catch (error) {
+      if (error instanceof DaoError) {
+        console.error('DDB error saving score:', error.wrapped)
+      }
+      return {
+        status: 500,
+        message: 'Internal error',
+      }
     }
   }
 }

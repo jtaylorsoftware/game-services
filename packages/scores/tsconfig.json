@@ -6,6 +6,6 @@
     "moduleResolution": "node",
     "outDir": "dist"
   },
-  "include": ["lib/**/*", "index.ts"],
+  "include": ["lib/**/*", "index.ts", "lambda/**/*"],
   "references": [{ "path": "../shared" }]
 }

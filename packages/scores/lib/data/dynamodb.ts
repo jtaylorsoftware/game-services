@@ -6,16 +6,17 @@ import {
   GlobalSecondaryIndex,
   KeySchemaElement,
   Projection,
-  QueryCommand,
   ResourceInUseException,
 } from '@aws-sdk/client-dynamodb'
 import {
   DynamoDBDocumentClient,
   PutCommand,
   PutCommandInput,
+  QueryCommand,
   QueryCommandInput,
 } from '@aws-sdk/lib-dynamodb'
 import { nanoid } from 'nanoid'
+import { title } from 'process'
 import { GameScore } from '../model.js'
 import { DaoError, GameScoreDao } from './dao.js'
 
@@ -79,7 +80,7 @@ export const PrimaryKeyAttributes: Array<
   },
 ]
 
-export type IndexNames = 'PlayerId' | 'GameTitleScore'
+export type IndexNames = 'PlayerIdIndex' | 'GameTitleScoreIndex'
 
 /**
  * The Global Secondary Indices that the table will use.
@@ -100,8 +101,8 @@ export const GlobalIndices: Readonly<
     }
   >
 > = {
-  PlayerId: {
-    IndexName: 'PlayerId',
+  PlayerIdIndex: {
+    IndexName: 'PlayerIdIndex',
     KeySchema: [
       {
         AttributeName: 'PlayerId',
@@ -116,8 +117,8 @@ export const GlobalIndices: Readonly<
       ProjectionType: 'ALL',
     },
   },
-  GameTitleScore: {
-    IndexName: 'GameTitleScore',
+  GameTitleScoreIndex: {
+    IndexName: 'GameTitleScoreIndex',
     KeySchema: [
       {
         AttributeName: 'GameTitle',
@@ -183,7 +184,7 @@ export class DynamoDbGameScoreDao implements GameScoreDao {
         PlayerId: score.PlayerId,
         PlayerUsername: score.PlayerUsername,
         Score: score.Score,
-        CreatedDateTime: new Date(),
+        CreatedDateTime: new Date().toISOString(),
       },
     }
 
@@ -205,10 +206,10 @@ export class DynamoDbGameScoreDao implements GameScoreDao {
   ): Promise<GameScore[]> {
     const params: QueryCommandInput = {
       TableName: TABLE_NAME,
-      IndexName: GlobalIndices.GameTitleScore.IndexName,
+      IndexName: GlobalIndices.GameTitleScoreIndex.IndexName,
       KeyConditionExpression: 'GameTitle = :title',
       ExpressionAttributeValues: {
-        ':title': { S: gameTitle },
+        ':title': gameTitle,
       },
       Limit: count,
       ScanIndexForward: ascending,
@@ -216,6 +217,7 @@ export class DynamoDbGameScoreDao implements GameScoreDao {
 
     try {
       const queryResult = await this.ddbDocClient.send(new QueryCommand(params))
+      console.log(`Found ${queryResult.Count} items with title ${title}`)
       // TODO expose paging to clients
       return queryResult.Items as unknown as GameScore[]
     } catch (error) {

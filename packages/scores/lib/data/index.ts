@@ -1,2 +1,2 @@
 export { GameScoreDao } from './dao.js'
-export { DynamoDbGameScoreDao } from './dynamodb.js'
+export { DynamoDbGameScoreDao, initTable } from './dynamodb.js'

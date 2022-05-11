@@ -12,6 +12,7 @@ import {
   Auth0RequestError,
   Auth0UserService,
   GameQueryService,
+  GameScoreQueryService,
   GameScoreService,
 } from '../lib/service.js'
 
@@ -124,7 +125,9 @@ describe('GameQueryService', () => {
           data: expected,
         }
       )
-      assert.isTrue(stub.get.calledWith('?title=Game%20Title'))
+      assert.isTrue(
+        stub.get.calledWith('/games', { params: { title: 'Game Title' } })
+      )
     })
 
     it('should return status when axios errors with response & status', async () => {
@@ -188,7 +191,7 @@ describe('GameScoreService', () => {
         PlayerId: userId,
         PlayerUsername: username,
         Score: 500,
-        CreatedDateTime: new Date(),
+        CreatedDateTime: new Date().toISOString(),
       }
       const { CreatedDateTime: timestamp, ...expected } = daoScore
 
@@ -204,7 +207,8 @@ describe('GameScoreService', () => {
 
       const { CreatedDateTime, ...score } = (result as Success<GameScore>).data
       assert.isTrue(
-        CreatedDateTime instanceof Date,
+        // @ts-ignore
+        !isNaN(new Date(CreatedDateTime)),
         'Score should have a CreatedDateTime'
       )
       assert.deepEqual(score, expected, 'Score should have username and an id')
@@ -278,6 +282,45 @@ describe('GameScoreService', () => {
           PlayerId: 'user123',
           Score: 500,
         }),
+        'status',
+        500
+      )
+    })
+  })
+})
+
+describe('GameScoreQueryService', () => {
+  let dao: sinon.SinonStubbedInstance<DynamoDbGameScoreDao>
+  let service: GameScoreQueryService
+
+  beforeEach(() => {
+    dao = sinon.createStubInstance(DynamoDbGameScoreDao)
+    service = new GameScoreQueryService(dao)
+  })
+
+  afterEach(() => {
+    sinon.reset()
+  })
+
+  describe('getTopScoresForGame', () => {
+    it('should return status 200 and list of scores returned by dao on success', async () => {
+      const expected = [
+        { GameTitle: 'Test', Score: 500 } as GameScore,
+        { GameTitle: 'Test', Score: 0 } as GameScore,
+      ]
+      dao.getByGame.resolves(expected)
+
+      await assert.eventually.deepEqual(
+        service.getTopScoresForGame('Test', 0),
+        { status: 200, data: expected }
+      )
+      assert.isTrue(dao.getByGame.calledWith('Test', 0))
+    })
+
+    it('should return status 500 when dao throws', () => {
+      dao.getByGame.rejects('ERROR')
+      assert.eventually.propertyVal(
+        service.getTopScoresForGame('Test', 0),
         'status',
         500
       )

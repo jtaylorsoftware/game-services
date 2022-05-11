@@ -12,7 +12,8 @@
 
 .vscode
 dist/
+node_modules/
+bundles/
 .env
 .DS_STORE
 .rollup.cache
-node_modules

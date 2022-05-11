@@ -40,7 +40,7 @@ export interface GameScore extends Record<GameScoreProperty, any> {
 
   Score: number
 
-  CreatedDateTime: Date
+  CreatedDateTime: string // Date
 }
 
 /**
