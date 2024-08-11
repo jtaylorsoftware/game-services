@@ -17,3 +17,4 @@ bundles/
 .env
 .DS_STORE
 .rollup.cache
+tsconfig.tsbuildinfo

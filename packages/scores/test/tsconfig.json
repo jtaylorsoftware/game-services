@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "target": "ESNext",
+    "module": "node16",
+    "moduleResolution": "node16",
     "strict": true,
     "noImplicitAny": true,
     "noImplicitOverride": true,

@@ -1,7 +1,7 @@
 import { ManagementClient, ObjectWithId, User } from 'auth0'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
-import { assert, default as chai } from 'chai'
+import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { Game, Success } from 'shared'
 import sinon from 'sinon'
@@ -16,14 +16,14 @@ import {
   GameScoreService,
 } from '../lib/service.js'
 
-chai.use(chaiAsPromised)
+use(chaiAsPromised)
 
 describe('Auth0UserService', () => {
   describe('getUserById', () => {
     it('calls auth0 ManagementClient with given id', async () => {
       const stub = sinon.createStubInstance(ManagementClient)
       stub.getUser.callsFake(
-        (_: ObjectWithId, cb?: (err: Error, user: User) => void) => {
+        () => {
           return Promise.resolve({
             id: 'abc_123',
             username: 'username',
@@ -112,7 +112,7 @@ describe('GameQueryService', () => {
       } as Game
       const instance = axios.create()
       const stub = sinon.stub(instance)
-      stub.get.callsFake((url: string) => {
+      stub.get.callsFake(() => {
         return Promise.resolve({
           data: expected,
         })
@@ -133,7 +133,7 @@ describe('GameQueryService', () => {
     it('should return status when axios errors with response & status', async () => {
       const instance = axios.create()
       const stub = sinon.stub(instance)
-      stub.get.callsFake((url: string) => {
+      stub.get.callsFake(() => {
         return Promise.reject({
           isAxiosError: true,
           response: {

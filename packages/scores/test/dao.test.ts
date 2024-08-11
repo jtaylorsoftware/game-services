@@ -4,7 +4,7 @@ import {
   PutCommandInput,
   QueryCommandInput,
 } from '@aws-sdk/lib-dynamodb'
-import { assert, default as chai } from 'chai'
+import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { DaoError } from '../lib/data/dao.js'
 import {
@@ -15,7 +15,7 @@ import {
 import { GameScore } from '../lib/model.js'
 import sinon from 'sinon'
 
-chai.use(chaiAsPromised)
+use(chaiAsPromised)
 
 describe('DynamoDbGameScoreDao', () => {
   let ddbDocClient: DynamoDBDocumentClient

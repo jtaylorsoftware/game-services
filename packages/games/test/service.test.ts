@@ -1,10 +1,10 @@
-import { assert, default as chai } from 'chai'
+import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
-import { DynamoDbGameDao } from '../lib/data/dynamodb'
-import { GameService } from '../lib/service'
+import { DynamoDbGameDao } from '../lib/data/dynamodb.js'
+import { GameService } from '../lib/service.js'
 
-chai.use(chaiAsPromised)
+use(chaiAsPromised)
 
 describe('GameService', () => {
   let dao: sinon.SinonStubbedInstance<DynamoDbGameDao>

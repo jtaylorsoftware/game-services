@@ -3,13 +3,13 @@ import {
   DynamoDBDocumentClient,
   QueryCommandInput,
 } from '@aws-sdk/lib-dynamodb'
-import { assert, default as chai } from 'chai'
+import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
-import { DaoError } from '../lib/data/dao'
-import { DynamoDbGameDao, TABLE_NAME } from '../lib/data/dynamodb'
+import { DaoError } from '../lib/data/dao.js'
+import { DynamoDbGameDao, TABLE_NAME } from '../lib/data/dynamodb.js'
 
-chai.use(chaiAsPromised)
+use(chaiAsPromised)
 
 describe('GameDao', () => {
   let ddbDocClient: DynamoDBDocumentClient
