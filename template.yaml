@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Game services API for saving scores, etc.
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Parameters:
+  GamesTable:
+    Type: String
+    Description: The DynamoDB table to store games
+    Default: Games
+  GameScoresTable:
+    Type: String
+    Description: The DynamoDB table to store game scores
+    Default: GameScores
+  OAuthIssuerUrl:
+    Type: String
+    Description: The URL of the OAuth2 issuer
+  OAuthAudience:
+    Type: String
+    Description: The audience for the OAuth2 tokens
+  OAuthSecretsArn:
+    Type: String
+    Description: The ARN of the Secrets Manager secret containing OAuth2 client secrets
+
+Resources:
+  PublicHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          OAuth2Authorizer:
+            JwtConfiguration:
+              issuer: !Ref OAuthIssuerUrl
+              audience:
+                - !Ref OAuthAudience
+            IdentitySource: "$request.header.Authorization"
+      CorsConfiguration:
+        AllowHeaders: "*"
+        AllowMethods: "*"
+        AllowOrigins:
+          - "*"
+
+  GetGamesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: bundles/get-games.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - x86_64
+      Timeout: 100
+      Description: Returns a list of games
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref GamesTable
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PublicHttpApi
+            Path: /api/games
+            Method: GET
+
+  GetTopScoresFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: bundles/get-top-scores.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - x86_64
+      Timeout: 100
+      Description: Returns the top scores for a game
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref GameScoresTable
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PublicHttpApi
+            Path: /api/scores
+            Method: GET
+
+  SaveScoreFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: bundles/save-score.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - x86_64
+      Timeout: 100
+      Description: Allows an authorized user to save a score for a game
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref GamesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GameScoresTable
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource: !Ref OAuthSecretsArn
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PublicHttpApi
+            Path: /api/scores
+            Method: POST
+            Auth:
+              Authorizer: OAuth2Authorizer
+            PayloadFormatVersion: "1.0"
+
+Outputs:
+  GameServicesApi:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub 
+      - "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/"
+      - Api: !Ref PublicHttpApi

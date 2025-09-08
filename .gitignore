@@ -18,3 +18,4 @@ bundles/
 .DS_STORE
 .rollup.cache
 tsconfig.tsbuildinfo
+.aws-sam/
